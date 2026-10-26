@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AI 신약개발 연구 대시보드</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  body { font-family: "Pretendard", "Malgun Gothic", sans-serif; background: #f7f7f5; color: #222; margin: 0; padding: 32px 16px; }
+  .wrap { max-width: 960px; margin: 0 auto; background: #fff; border-radius: 12px; padding: 28px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  h1 { font-size: 22px; margin: 0 0 4px; }
+  h2 { font-size: 16px; margin: 28px 0 10px; }
+  .sub { color: #666; font-size: 14px; margin-bottom: 20px; }
+  .kpi { display: flex; gap: 16px; flex-wrap: wrap; }
+  .kpi div { flex: 1; min-width: 200px; background: #eef2ff; border-radius: 10px; padding: 14px 18px; }
+  .kpi b { display: block; font-size: 30px; color: #3b4fd8; }
+  .kpi span { font-size: 13px; color: #555; }
+  .insight { margin-top: 24px; padding: 14px 18px; background: #fff7e6; border-left: 4px solid #f0a020; border-radius: 6px; font-size: 15px; }
+  .src { font-size: 12px; color: #888; margin-top: 16px; line-height: 1.6; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>AI 신약개발 연구 동향 대시보드</h1>
+  <div class="sub">이 페이지는 [제약사 신약개발 연구원]이 [분기 연구과제 기획 회의 전]에 [다음에 도입할 AI 기법을 고르기] 위해 본다</div>
+
+  <div class="kpi">
+    <div><b>1,580편</b><span>2025년 AI 신약개발 논문 수</span></div>
+    <div><b>4.7배</b><span>최근 5년 증가 (2020년 334편 → 2025년)</span></div>
+    <div><b>24.5배</b><span>가장 빨리 큰 기법: 그래프 신경망 (8편 → 196편)</span></div>
+  </div>
+
+  <h2>① 연도별 AI 신약개발 논문 수 (2010~2025)</h2>
+  <canvas id="trend" height="110"></canvas>
+
+  <h2>② AI 기법별 논문 수: 2020년 vs 2025년</h2>
+  <canvas id="method" height="130"></canvas>
+
+  <div class="insight"><b>인사이트:</b> 딥러닝·머신러닝이 여전히 주류지만, 5년간 가장 빠르게 큰 건 그래프 신경망(24.5배)과 생성형 AI(8.9배)이고, LLM·AlphaFold는 2020년 0편에서 새로 등장했다.</div>
+
+  <div class="src">
+    출처: PubMed (NCBI E-utilities esearch 검색 건수, 2026-10-26 조회)<br>
+    ① 검색식: ("artificial intelligence" OR "machine learning" OR "deep learning")[Title/Abstract] AND "drug discovery"[Title/Abstract] AND &lt;연도&gt;[pdat]<br>
+    ② 검색식: &lt;기법&gt;[Title/Abstract] AND "drug discovery"[Title/Abstract] AND &lt;연도&gt;[pdat] — 한 논문이 여러 기법에 중복 집계될 수 있음<br>
+    ※ 2026년은 진행 중이라 제외. PubMed 색인 갱신에 따라 수치가 소폭 달라질 수 있음.
+  </div>
+</div>
+
+<script>
+const years = [2010,2011,2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022,2023,2024,2025];
+const counts = [12,24,19,29,33,62,47,54,168,278,334,516,646,796,1043,1580];
+
+new Chart(document.getElementById('trend'), {
+  type: 'line',
+  data: { labels: years, datasets: [{ data: counts, borderColor: '#3b4fd8', backgroundColor: 'rgba(59,79,216,.12)', fill: true, tension: .3, pointRadius: 4 }] },
+  options: {
+    plugins: { legend: { display: false }, tooltip: { callbacks: { label: c => c.parsed.y.toLocaleString() + '편' } } },
+    scales: { y: { beginAtZero: true, title: { display: true, text: '논문 수(편)' } }, x: { title: { display: true, text: '출판 연도' } } }
+  }
+});
+
+const methods = ['머신러닝', '딥러닝', '생성형 AI', '그래프 신경망', '대규모 언어모델(LLM)', 'AlphaFold', '강화학습'];
+const y2020 = [239, 131, 23, 8, 0, 0, 5];
+const y2025 = [876, 632, 205, 196, 108, 84, 51];
+
+new Chart(document.getElementById('method'), {
+  type: 'bar',
+  data: {
+    labels: methods,
+    datasets: [
+      { label: '2020년', data: y2020, backgroundColor: '#c7cdf5' },
+      { label: '2025년', data: y2025, backgroundColor: '#3b4fd8' }
+    ]
+  },
+  options: {
+    indexAxis: 'y',
+    plugins: { tooltip: { callbacks: { label: c => c.dataset.label + ': ' + c.parsed.x.toLocaleString() + '편' } } },
+    scales: { x: { beginAtZero: true, title: { display: true, text: '논문 수(편)' } } }
+  }
+});
+</script>
+</body>
+</html>
